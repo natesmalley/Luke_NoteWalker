@@ -62,33 +62,53 @@ class ResearchEngine:
             """,
             
             'business': """
-                Research this business/enterprise topic for a SentinelOne AI-SIEM Thought Leader: "{content}"
+                Provide comprehensive business intelligence research for this SentinelOne AI-SIEM Thought Leader request: "{content}"
                 
-                **Executive Business Intelligence:**
-                - Company background, financial performance, and market position
-                - Leadership team, decision-makers, and organizational structure  
-                - Recent earnings, strategic initiatives, and technology investments
-                - Security posture, compliance requirements, and risk management approach
+                **EXECUTIVE SUMMARY:**
+                Provide a 2-3 paragraph executive overview of the company, their strategic priorities, and partnership potential.
                 
-                **Partnership & Customer Intelligence:**
-                - Technology stack, security tools, and current vendor relationships
-                - Digital transformation initiatives and modernization efforts
-                - Pain points, challenges, and areas where AI-SIEM solutions apply
-                - Decision-making process, procurement cycles, and key influencers
+                **COMPANY INTELLIGENCE:**
+                - Corporate structure: Parent company, subsidiaries, key divisions
+                - Financial performance: Recent revenue, profitability, growth trends
+                - Market position: Industry ranking, competitive advantages, market share
+                - Leadership team: CEO, CISO, CTO, key decision makers and backgrounds
+                - Recent strategic initiatives: Major announcements, acquisitions, partnerships
                 
-                **Competitive & Market Context:**
-                - Current security solutions and vendor landscape
-                - Recent security incidents, breaches, or compliance issues
-                - Industry-specific regulatory requirements and standards
-                - Peer companies and industry benchmarking data
+                **SECURITY & TECHNOLOGY POSTURE:**
+                - Current security infrastructure and vendor relationships
+                - Recent security incidents, breaches, or compliance challenges
+                - Technology modernization initiatives and digital transformation projects
+                - Cloud adoption strategy and preferred platforms (AWS, Azure, GCP)
+                - Regulatory compliance requirements (SOX, PCI, HIPAA, etc.)
                 
-                **Meeting Preparation:**
-                - Key talking points for security leadership discussions
-                - Value proposition alignment with their specific needs
-                - Case studies or success stories from similar organizations
-                - Questions to uncover AI-SIEM adoption readiness
+                **AI-SIEM OPPORTUNITY ANALYSIS:**
+                - Current SIEM/security analytics solutions in use
+                - Pain points with existing security operations and incident response
+                - AI/ML maturity and adoption in their security program
+                - Budget cycles, procurement processes, and decision timelines
+                - Technical requirements and integration considerations
                 
-                Focus on actionable intelligence for executive meetings, partnership discussions, and strategic customer engagements in the cybersecurity space.
+                **PARTNERSHIP INTELLIGENCE:**
+                - Existing technology partnerships and vendor relationships
+                - Partnership criteria and evaluation processes
+                - Success stories with similar security vendors
+                - Key stakeholders involved in partnership decisions
+                - Preferred engagement models and contract structures
+                
+                **MEETING PREPARATION:**
+                - 5-7 key talking points for security leadership discussions
+                - Value proposition alignment with their specific business needs
+                - Questions to assess AI-SIEM readiness and technical requirements
+                - Competitive positioning against their current solutions
+                - Case studies and references from similar organizations
+                
+                **NEXT STEPS & FOLLOW-UP:**
+                - Recommended meeting agenda and discussion topics
+                - Key documents or materials to prepare for the engagement
+                - Potential pilot project or proof-of-concept opportunities
+                - Timeline expectations for decision-making and implementation
+                
+                Provide specific, actionable intelligence with concrete details, names, numbers, and recent developments. Focus on information that enables confident, informed discussions with C-level executives and security leaders.
             """,
             
             'market_research': """

@@ -34,10 +34,10 @@ class Config:
     claude_research_model: str = "claude-3-5-sonnet-20250107"
     openai_model: str = "gpt-4o-mini"
     
-    # Token limits - Updated for modern models and comprehensive research
-    max_analysis_tokens: int = 1000    # Increased for complex content analysis
-    max_research_tokens: int = 4000    # Significantly increased for detailed research
-    max_input_tokens: int = 50000      # Maximum input context size
+    # Token limits - Optimized for comprehensive business intelligence
+    max_analysis_tokens: int = 2000    # Increased for complex multi-domain analysis
+    max_research_tokens: int = 8000    # Maximum detailed research for executive briefings
+    max_input_tokens: int = 100000     # Support very long notes without truncation
     
     # Research quality settings
     enable_long_form_research: bool = True
