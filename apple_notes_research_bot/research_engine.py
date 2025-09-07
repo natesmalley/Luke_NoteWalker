@@ -62,18 +62,69 @@ class ResearchEngine:
             """,
             
             'business': """
-                Research this business/enterprise topic: "{content}"
+                Research this business/enterprise topic for a SentinelOne AI-SIEM Thought Leader: "{content}"
                 
-                Provide comprehensive business intelligence including:
-                1. Company background, financials, and market position
-                2. Recent business developments and strategic initiatives
-                3. Leadership team and organizational structure
-                4. Technology investments and digital transformation efforts
-                5. Partnership opportunities and competitive landscape
-                6. Regulatory compliance and industry positioning
-                7. Meeting preparation insights and talking points
+                **Executive Business Intelligence:**
+                - Company background, financial performance, and market position
+                - Leadership team, decision-makers, and organizational structure  
+                - Recent earnings, strategic initiatives, and technology investments
+                - Security posture, compliance requirements, and risk management approach
                 
-                Focus on actionable business intelligence for partnership discussions, meetings, and strategic decisions. Include relevant financial data, recent 10-K/earnings information if applicable, and competitive analysis.
+                **Partnership & Customer Intelligence:**
+                - Technology stack, security tools, and current vendor relationships
+                - Digital transformation initiatives and modernization efforts
+                - Pain points, challenges, and areas where AI-SIEM solutions apply
+                - Decision-making process, procurement cycles, and key influencers
+                
+                **Competitive & Market Context:**
+                - Current security solutions and vendor landscape
+                - Recent security incidents, breaches, or compliance issues
+                - Industry-specific regulatory requirements and standards
+                - Peer companies and industry benchmarking data
+                
+                **Meeting Preparation:**
+                - Key talking points for security leadership discussions
+                - Value proposition alignment with their specific needs
+                - Case studies or success stories from similar organizations
+                - Questions to uncover AI-SIEM adoption readiness
+                
+                Focus on actionable intelligence for executive meetings, partnership discussions, and strategic customer engagements in the cybersecurity space.
+            """,
+            
+            'market_research': """
+                Conduct comprehensive market research for this business/technology opportunity: "{content}"
+                
+                **Market Analysis:**
+                - Total Addressable Market (TAM) size and growth projections
+                - Market segments, customer personas, and use cases
+                - Current market leaders and competitive landscape analysis
+                - Pricing models, business models, and revenue opportunities
+                
+                **Competitive Intelligence:**
+                - Direct and indirect competitors analysis
+                - Market positioning and differentiation opportunities
+                - Competitive advantages, weaknesses, and market gaps
+                - Recent funding, acquisitions, and strategic moves
+                
+                **Technology & Trends:**
+                - Recent technological developments and innovations
+                - Industry trends, disruptions, and emerging opportunities
+                - Regulatory changes and compliance requirements
+                - Integration opportunities with existing solutions
+                
+                **Go-to-Market Insights:**
+                - Target customer research and buying behavior
+                - Distribution channels and partnership opportunities
+                - Marketing strategies and positioning approaches
+                - Potential challenges and barriers to adoption
+                
+                **OpenSource Strategy:**
+                - Open source ecosystem and community analysis
+                - Contribution opportunities and community engagement
+                - Business model implications of open source approach
+                - Examples of successful open source companies in this space
+                
+                Provide actionable insights for business development, product strategy, and market entry decisions suitable for a technology thought leader building innovative solutions.
             """,
             
             'building': """
@@ -154,6 +205,13 @@ class ResearchEngine:
     async def research(self, content: str, category: str, 
                        research_approach: Optional[str] = None) -> Dict[str, ResearchResult]:
         """Conduct research using appropriate method (single or multi-agent)"""
+        
+        # Check input size and warn if potentially too large
+        estimated_tokens = len(content.split()) * 1.3  # Rough token estimate
+        if estimated_tokens > self.config.max_input_tokens:
+            logger.warning(f"Input content very large ({estimated_tokens:.0f} tokens), may be truncated")
+        
+        logger.info(f"Researching {len(content)} characters, estimated {estimated_tokens:.0f} tokens, category: {category}")
         
         # Check if content warrants multi-agent research
         if self._should_use_multi_agent(content, category):
@@ -273,13 +331,12 @@ TALKING POINTS:
         try:
             # Add category-specific system prompts
             system_prompts = {
-                'software': "You are an expert software engineer with deep knowledge of modern development practices.",
-                'ai': "You are an AI/ML specialist with expertise in current models and techniques.",
-                'business': "You are a business intelligence analyst with expertise in enterprise research, financial analysis, and partnership development. You have access to current market data and business intelligence.",
-                'building': "You are a construction expert with practical DIY experience.",
-                'lifestyle': "You are a lifestyle consultant with local knowledge and creative ideas.",
-                'productivity': "You are a productivity expert focused on evidence-based methods.",
-                'general': "You are a knowledgeable research assistant providing accurate information."
+                'business': "You are a senior business intelligence analyst specializing in enterprise research, cybersecurity partnerships, and executive briefings for a SentinelOne AI-SIEM Thought Leader. You provide actionable intelligence for C-level meetings and strategic partnerships.",
+                'market_research': "You are a strategic market research analyst and business development expert. You specialize in TAM analysis, competitive intelligence, and go-to-market strategies for technology companies, with deep expertise in open source business models and cybersecurity markets.",
+                'security': "You are a cybersecurity expert with deep knowledge of enterprise security, AI-SIEM solutions, threat detection, and compliance frameworks. You understand the security vendor landscape and customer needs.",
+                'ai': "You are an AI/ML specialist with expertise in current models, techniques, and business applications in cybersecurity and enterprise contexts.",
+                'software': "You are an expert software engineer with deep knowledge of modern development practices, open source ecosystems, and enterprise software architecture.",
+                'general': "You are a knowledgeable research assistant providing accurate, actionable information for business and technology decision-making."
             }
             
             system_prompt = system_prompts.get(category, system_prompts['general'])
@@ -318,13 +375,12 @@ TALKING POINTS:
         try:
             # Add category-specific system prompts
             system_prompts = {
-                'software': "You are an expert software engineer providing practical development advice.",
-                'ai': "You are an AI researcher with expertise in practical ML applications.",
-                'business': "You are a senior business analyst specializing in enterprise intelligence, financial research, and strategic business analysis. You provide actionable insights for business meetings and partnerships.",
-                'building': "You are a construction professional with hands-on experience.",
-                'lifestyle': "You are a lifestyle expert with creative and practical suggestions.",
-                'productivity': "You are a productivity coach focused on sustainable improvements.",
-                'general': "You are a helpful research assistant providing comprehensive information."
+                'business': "You are a senior business analyst specializing in enterprise intelligence for cybersecurity partnerships. You provide actionable insights for executive meetings, strategic partnerships, and customer engagements in the security space.",
+                'market_research': "You are a strategic market analyst focused on technology markets, competitive intelligence, and business development. You excel at TAM analysis, competitive positioning, and go-to-market strategies for innovative technology solutions.",
+                'security': "You are a cybersecurity expert with deep knowledge of enterprise security solutions, threat landscapes, and the security vendor ecosystem. You understand customer needs and market dynamics in cybersecurity.",
+                'ai': "You are an AI researcher with expertise in practical applications of AI/ML in cybersecurity and enterprise contexts.",
+                'software': "You are an expert software engineer with knowledge of modern development practices and open source ecosystems.",
+                'general': "You are a research assistant providing comprehensive, actionable information for business and technology decision-making."
             }
             
             system_prompt = system_prompts.get(category, system_prompts['general'])

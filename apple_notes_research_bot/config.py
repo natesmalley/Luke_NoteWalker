@@ -22,7 +22,7 @@ class Config:
     
     # Monitoring settings
     check_interval: int = 30  # seconds
-    monitor_folders: List[str] = field(default_factory=lambda: ["Notes"])
+    monitor_folders: List[str] = field(default_factory=lambda: ["Self Learning"])
     
     # Research settings
     research_confidence_threshold: float = 0.7
@@ -34,13 +34,18 @@ class Config:
     claude_research_model: str = "claude-3-5-sonnet-20250107"
     openai_model: str = "gpt-4o-mini"
     
-    # Token limits
-    max_analysis_tokens: int = 300
-    max_research_tokens: int = 800
+    # Token limits - Updated for modern models and comprehensive research
+    max_analysis_tokens: int = 1000    # Increased for complex content analysis
+    max_research_tokens: int = 4000    # Significantly increased for detailed research
+    max_input_tokens: int = 50000      # Maximum input context size
     
-    # Categories
+    # Research quality settings
+    enable_long_form_research: bool = True
+    comprehensive_business_research: bool = True
+    
+    # Categories - Optimized for SentinelOne AI-SIEM Thought Leadership
     research_categories: List[str] = field(default_factory=lambda: [
-        "software", "ai", "business", "building", "lifestyle", "productivity", "general"
+        "business", "market_research", "ai", "software", "security", "general"
     ])
     
     # Logging
