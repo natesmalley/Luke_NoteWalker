@@ -1,0 +1,149 @@
+# ============================================
+# SECURITY - API Keys and Secrets (NEVER COMMIT)
+# ============================================
+.env
+.env.*
+*.env
+!.env.template
+config.json
+secrets/
+credentials/
+*_api_key*
+*_secret*
+
+# ============================================
+# State and Cache Files
+# ============================================
+.notes_monitor_state.json
+.research_bot_state.json
+.processed_notes_cache.json
+state.json
+*.state
+.state/
+*.cache
+*.tmp
+
+# ============================================
+# Logs and Debug Files
+# ============================================
+*.log
+logs/
+debug/
+*.debug
+research_bot.log
+
+# ============================================
+# Hidden and System Directories
+# ============================================
+.coral_collective/
+.claude/
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# ============================================
+# Virtual Environments
+# ============================================
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+virtualenv/
+.virtualenv/
+
+# ============================================
+# IDE and Editor Files
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+*.tmproj
+*.tmproject
+tmtags
+
+# ============================================
+# Test and Development Files
+# ============================================
+test_output/
+test_results/
+coverage/
+.coverage
+.pytest_cache/
+.tox/
+htmlcov/
+*.cover
+.hypothesis/
+
+# ============================================
+# Build and Distribution
+# ============================================
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.manifest
+*.spec
+
+# ============================================
+# Python Specific
+# ============================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs
+*.log
+research_bot.log
+test_result_*.txt
+
+# macOS
+.DS_Store
+*.plist
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Metrics and state
+research_bot_metrics.json
+metrics/
+feedback/

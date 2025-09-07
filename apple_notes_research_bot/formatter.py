@@ -1,0 +1,490 @@
+"""
+Note formatting and structuring for research results
+"""
+
+import logging
+from datetime import datetime
+from typing import Dict, Optional
+from .research_engine import ResearchResult
+from .analyzer import AnalysisResult
+from .monitor import Note
+
+logger = logging.getLogger(__name__)
+
+class NoteFormatter:
+    """Formats research findings for note updates"""
+    
+    def __init__(self):
+        self.format_templates = {
+            'default': """<title>
+
+📝 ORIGINAL NOTE:
+<original>
+
+🔍 RESEARCH APPROACH:
+<approach>
+
+📊 KEY FINDINGS:
+<findings>
+
+💡 ACTIONABLE INSIGHTS:
+<insights>
+
+📚 ADDITIONAL RESOURCES:
+<resources>
+
+🕐 Research completed: <timestamp>
+---
+Powered by CoralCollective Research Bot
+""",
+            
+            'software': """<title>
+
+📝 ORIGINAL QUESTION:
+<original>
+
+🔍 RESEARCH APPROACH:
+<approach>
+
+💻 TECHNICAL SOLUTION:
+<findings>
+
+🔧 IMPLEMENTATION NOTES:
+<insights>
+
+📚 REFERENCES:
+<resources>
+
+🕐 Research completed: <timestamp>
+---
+Powered by CoralCollective Research Bot
+""",
+            
+            'lifestyle': """<title>
+
+📝 YOUR QUERY:
+<original>
+
+🔍 RESEARCH APPROACH:
+<approach>
+
+✨ RECOMMENDATIONS:
+<findings>
+
+💡 TIPS & SUGGESTIONS:
+<insights>
+
+📍 ADDITIONAL OPTIONS:
+<resources>
+
+🕐 Research completed: <timestamp>
+---
+Powered by CoralCollective Research Bot
+""",
+
+            'multi_agent': """<title>
+
+📝 ORIGINAL REQUEST:
+<original>
+
+🎯 EXECUTIVE SUMMARY:
+<executive_summary>
+
+🔍 MULTI-DOMAIN RESEARCH FINDINGS:
+<findings>
+
+🚀 ACTIONABLE RECOMMENDATIONS:
+<insights>
+
+💼 MEETING TALKING POINTS:
+<talking_points>
+
+🎯 NEXT STEPS:
+<next_actions>
+
+🕐 Research completed: <timestamp>
+---
+🤖 Multi-Agent Research powered by CoralCollective
+Domains analyzed: <domains>
+""",
+
+            'enterprise': """<title>
+
+📝 PARTNERSHIP RESEARCH REQUEST:
+<original>
+
+📊 EXECUTIVE SUMMARY:
+<executive_summary>
+
+🔒 SECURITY ANALYSIS:
+<security_findings>
+
+🛠️ TECHNICAL CAPABILITIES:
+<technical_findings>
+
+💼 BUSINESS INTELLIGENCE:
+<business_findings>
+
+🤝 PARTNERSHIP OPPORTUNITIES:
+<partnership_findings>
+
+💡 KEY INSIGHTS:
+<insights>
+
+📋 MEETING PREPARATION:
+<talking_points>
+
+🎯 RECOMMENDED NEXT ACTIONS:
+<next_actions>
+
+🕐 Research completed: <timestamp>
+---
+🤖 Enterprise Multi-Agent Analysis by CoralCollective
+"""
+        }
+    
+    def format_researched_note(self, 
+                               note: Note,
+                               analysis: AnalysisResult,
+                               research_results: Dict[str, ResearchResult],
+                               synthesized_research: Optional[str] = None) -> str:
+        """Format a note with research findings"""
+        
+        # Check if this is a multi-agent research result
+        if 'multi_agent' in research_results:
+            return self._format_multi_agent_note(note, analysis, research_results)
+        
+        # Generate meaningful title with date
+        title = self._generate_title(note, analysis)
+        
+        # Extract key information from research
+        if synthesized_research:
+            findings = synthesized_research
+            insights = self._extract_insights(synthesized_research)
+            resources = self._extract_resources(synthesized_research)
+        else:
+            findings = self._format_research_findings(research_results)
+            insights = self._extract_insights_from_results(research_results)
+            resources = self._extract_resources_from_results(research_results)
+        
+        # Select appropriate template
+        template = self.format_templates.get(
+            analysis.category,
+            self.format_templates['default']
+        )
+        
+        # Format the note
+        formatted = template.replace('<title>', title)
+        formatted = formatted.replace('<original>', note.body.strip())
+        formatted = formatted.replace('<approach>', analysis.research_approach or 
+                                     f"AI-powered research for {analysis.category} topics")
+        formatted = formatted.replace('<findings>', findings)
+        formatted = formatted.replace('<insights>', insights)
+        formatted = formatted.replace('<resources>', resources)
+        formatted = formatted.replace('<timestamp>', datetime.now().strftime('%Y-%m-%d %H:%M'))
+        
+        return formatted
+    
+    def _format_multi_agent_note(self, note: Note, analysis: AnalysisResult, 
+                                research_results: Dict[str, ResearchResult]) -> str:
+        """Format multi-agent research results"""
+        
+        # Generate title for multi-agent research
+        title = self._generate_multi_agent_title(note, analysis)
+        
+        # Get the main multi-agent result
+        multi_agent_result = research_results.get('multi_agent')
+        if not multi_agent_result or not multi_agent_result.success:
+            return self._format_fallback_multi_agent(note, analysis, research_results)
+        
+        # Parse the multi-agent content for different sections
+        content = multi_agent_result.content
+        sections = self._parse_multi_agent_content(content)
+        
+        # Check if we have enterprise/partnership focus
+        has_partnership_focus = any(keyword in note.body.lower() 
+                                  for keyword in ['partnership', 'meeting with', 'collaboration', 'enterprise'])
+        
+        template_key = 'enterprise' if has_partnership_focus else 'multi_agent'
+        template = self.format_templates[template_key]
+        
+        # Format the template
+        formatted = template.replace('<title>', title)
+        formatted = formatted.replace('<original>', note.body.strip())
+        formatted = formatted.replace('<executive_summary>', sections.get('executive_summary', 'See findings below'))
+        formatted = formatted.replace('<findings>', sections.get('findings', content))
+        formatted = formatted.replace('<insights>', sections.get('insights', 'See findings above'))
+        formatted = formatted.replace('<talking_points>', sections.get('talking_points', 'Not specified'))
+        formatted = formatted.replace('<next_actions>', sections.get('next_actions', 'Review findings and plan next steps'))
+        formatted = formatted.replace('<timestamp>', datetime.now().strftime('%Y-%m-%d %H:%M'))
+        
+        # Add domain information
+        domains_analyzed = [domain for domain in research_results.keys() 
+                          if domain != 'multi_agent' and research_results[domain].success]
+        formatted = formatted.replace('<domains>', ', '.join(domains_analyzed) if domains_analyzed else 'Multi-domain')
+        
+        # For enterprise template, add individual domain sections
+        if template_key == 'enterprise':
+            formatted = self._add_enterprise_sections(formatted, research_results)
+        
+        return formatted
+    
+    def _generate_multi_agent_title(self, note: Note, analysis: AnalysisResult) -> str:
+        """Generate title for multi-agent research"""
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        
+        # Check for company names in the note
+        import re
+        company_match = re.search(r'\b([A-Z][a-z]+ [A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b', note.body)
+        company_name = company_match.group(1) if company_match else ""
+        
+        # Special cases for well-known patterns
+        if "new york life" in note.body.lower():
+            company_name = "New York Life"
+        
+        if company_name:
+            if analysis.multi_domain:
+                return f"🏢 {company_name} - Multi-Domain Research {date_str}"
+            else:
+                return f"🏢 {company_name} - Partnership Research {date_str}"
+        else:
+            return f"🤖 Multi-Agent Research Analysis - {date_str}"
+    
+    def _parse_multi_agent_content(self, content: str) -> Dict[str, str]:
+        """Parse multi-agent content into sections"""
+        sections = {}
+        
+        # Define section markers
+        section_markers = {
+            'executive_summary': ['EXECUTIVE SUMMARY', 'SUMMARY'],
+            'findings': ['DETAILED FINDINGS', 'FINDINGS', 'RESEARCH FINDINGS'],
+            'insights': ['KEY INSIGHTS', 'INSIGHTS', 'ACTIONABLE RECOMMENDATIONS'],
+            'talking_points': ['MEETING TALKING POINTS', 'TALKING POINTS'],
+            'next_actions': ['NEXT STEPS', 'RECOMMENDED ACTIONS', 'ACTION ITEMS']
+        }
+        
+        for section_name, markers in section_markers.items():
+            for marker in markers:
+                section_content = self._extract_section_between_markers(content, marker)
+                if section_content:
+                    sections[section_name] = section_content
+                    break
+        
+        return sections
+    
+    def _extract_section_between_markers(self, content: str, start_marker: str) -> str:
+        """Extract content between section markers"""
+        lines = content.split('\n')
+        section_lines = []
+        in_section = False
+        
+        for line in lines:
+            if start_marker in line.upper():
+                in_section = True
+                continue
+            elif in_section:
+                # Stop at next major section
+                if any(marker in line.upper() for marker in 
+                      ['EXECUTIVE SUMMARY', 'DETAILED FINDINGS', 'KEY INSIGHTS', 
+                       'TALKING POINTS', 'NEXT STEPS', 'RECOMMENDATIONS']):
+                    if line.strip() != start_marker:  # Don't stop if it's the same section
+                        break
+                section_lines.append(line)
+        
+        return '\n'.join(section_lines).strip()
+    
+    def _add_enterprise_sections(self, formatted: str, research_results: Dict[str, ResearchResult]) -> str:
+        """Add individual agent findings to enterprise template"""
+        
+        # Extract findings from individual agents
+        agent_sections = {
+            'security_findings': research_results.get('security_agent'),
+            'technical_findings': research_results.get('technical_agent'), 
+            'business_findings': research_results.get('business_agent'),
+            'partnership_findings': research_results.get('partnership_agent')
+        }
+        
+        for section_key, result in agent_sections.items():
+            if result and result.success:
+                # Extract just the findings section from the agent result
+                findings_content = self._extract_agent_findings(result.content)
+                formatted = formatted.replace(f'<{section_key}>', findings_content)
+            else:
+                formatted = formatted.replace(f'<{section_key}>', 'Analysis not available')
+        
+        return formatted
+    
+    def _extract_agent_findings(self, content: str) -> str:
+        """Extract the findings section from agent content"""
+        # Look for FINDINGS section first
+        findings = self._extract_section_between_markers(content, 'FINDINGS')
+        if findings:
+            return findings[:500] + "..." if len(findings) > 500 else findings
+        
+        # Fallback to first 300 characters
+        return content[:300] + "..." if len(content) > 300 else content
+    
+    def _format_fallback_multi_agent(self, note: Note, analysis: AnalysisResult, 
+                                    research_results: Dict[str, ResearchResult]) -> str:
+        """Fallback formatting when multi-agent result is not available"""
+        
+        # Use individual agent results
+        successful_agents = {k: v for k, v in research_results.items() 
+                           if v.success and k != 'multi_agent'}
+        
+        if not successful_agents:
+            return self.format_researched_note(note, analysis, research_results, 
+                                             "Multi-agent research encountered errors.")
+        
+        # Create a simple multi-agent summary
+        findings_sections = []
+        for agent_name, result in successful_agents.items():
+            findings_sections.append(f"**{agent_name.replace('_agent', '').upper()} ANALYSIS:**\n{result.content[:400]}...")
+        
+        combined_findings = '\n\n'.join(findings_sections)
+        
+        return self.format_researched_note(note, analysis, research_results, combined_findings)
+    
+    def _generate_title(self, note: Note, analysis: AnalysisResult) -> str:
+        """Generate a meaningful title with date"""
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        
+        # Extract key topic from note
+        original_title = note.name or ""
+        if len(original_title) > 50:
+            original_title = original_title[:50] + "..."
+        
+        # Add category context
+        category_labels = {
+            'software': '💻',
+            'ai': '🤖',
+            'building': '🔨',
+            'lifestyle': '🎯',
+            'productivity': '📈',
+            'security': '🔒',
+            'business': '💼',
+            'technical': '🛠️',
+            'partnership': '🤝',
+            'general': '📚'
+        }
+        
+        emoji = category_labels.get(analysis.category, '📝')
+        
+        # Create enhanced title
+        if original_title:
+            title = f"{emoji} {original_title} - Researched {date_str}"
+        else:
+            # Generate title from first line of content
+            first_line = note.body.split('\n')[0][:50]
+            title = f"{emoji} {first_line}... - Researched {date_str}"
+        
+        return title
+    
+    def _format_research_findings(self, research_results: Dict[str, ResearchResult]) -> str:
+        """Format research findings from multiple providers"""
+        findings = []
+        
+        for provider, result in research_results.items():
+            if result.success and result.content:
+                findings.append(f"**{provider.upper()} Analysis:**\n{result.content}")
+        
+        return "\n\n".join(findings) if findings else "No research findings available."
+    
+    def _extract_insights(self, content: str) -> str:
+        """Extract actionable insights from research"""
+        # Look for numbered lists or bullet points
+        lines = content.split('\n')
+        insights = []
+        
+        for line in lines:
+            line = line.strip()
+            # Look for action items
+            if any(marker in line[:5] for marker in ['•', '-', '*', '1.', '2.', '3.']):
+                if any(word in line.lower() for word in ['recommend', 'should', 'consider', 'try', 'use']):
+                    insights.append(line)
+        
+        if insights:
+            return '\n'.join(insights[:5])  # Top 5 insights
+        
+        # Fallback to extracting recommendation sentences
+        sentences = content.split('.')
+        recommendations = [
+            s.strip() + '.' 
+            for s in sentences 
+            if any(word in s.lower() for word in ['recommend', 'suggest', 'best', 'should'])
+        ]
+        
+        return '\n'.join(recommendations[:3]) if recommendations else "See findings above for insights."
+    
+    def _extract_insights_from_results(self, research_results: Dict[str, ResearchResult]) -> str:
+        """Extract insights from multiple research results"""
+        all_insights = []
+        
+        for provider, result in research_results.items():
+            if result.success and result.content:
+                insights = self._extract_insights(result.content)
+                if insights and insights != "See findings above for insights.":
+                    all_insights.append(f"From {provider}: {insights}")
+        
+        return '\n'.join(all_insights) if all_insights else "See findings above for insights."
+    
+    def _extract_resources(self, content: str) -> str:
+        """Extract resources, links, or references from research"""
+        resources = []
+        
+        # Look for tool/library mentions
+        tool_keywords = ['library', 'framework', 'tool', 'package', 'api', 'service']
+        lines = content.split('\n')
+        
+        for line in lines:
+            if any(keyword in line.lower() for keyword in tool_keywords):
+                # Extract tool names (usually capitalized or in quotes)
+                import re
+                # Find quoted items
+                quoted = re.findall(r'"([^"]*)"', line)
+                resources.extend(quoted)
+                # Find capitalized words that might be tool names
+                caps = re.findall(r'\b[A-Z][a-z]+(?:[A-Z][a-z]+)*\b', line)
+                resources.extend(caps)
+        
+        # Remove duplicates and common words
+        common_words = {'The', 'This', 'These', 'That', 'For', 'API', 'SDK'}
+        resources = list(set(r for r in resources if r not in common_words))
+        
+        if resources:
+            return '• ' + '\n• '.join(resources[:5])  # Top 5 resources
+        
+        return "No additional resources identified."
+    
+    def _extract_resources_from_results(self, research_results: Dict[str, ResearchResult]) -> str:
+        """Extract resources from multiple research results"""
+        all_resources = set()
+        
+        for provider, result in research_results.items():
+            if result.success and result.content:
+                resources_text = self._extract_resources(result.content)
+                if resources_text != "No additional resources identified.":
+                    # Parse bullet points
+                    for line in resources_text.split('\n'):
+                        if line.startswith('• '):
+                            all_resources.add(line[2:])
+        
+        if all_resources:
+            return '• ' + '\n• '.join(sorted(all_resources)[:8])  # Top 8 unique resources
+        
+        return "No additional resources identified."
+    
+    def preserve_original_formatting(self, original_body: str, research_section: str) -> str:
+        """Preserve original note formatting when appending research"""
+        
+        # Check if note already has research section
+        if "🔍 RESEARCH" in original_body or "Research completed:" in original_body:
+            # Note was already researched - replace old research
+            import re
+            # Find the research section start
+            research_pattern = r'(🔍 RESEARCH|📊 KEY FINDINGS|💻 TECHNICAL SOLUTION).*?(?=\n---\n|$)'
+            original_without_research = re.sub(research_pattern, '', original_body, flags=re.DOTALL)
+            return original_without_research.strip() + "\n\n" + research_section
+        else:
+            # New research - append to original
+            return original_body.strip() + "\n\n" + "=" * 50 + "\n\n" + research_section
