@@ -14,7 +14,7 @@ from typing import Optional
 from .config import Config, setup_logging
 from .monitor import NotesMonitor
 from .analyzer import ContentAnalyzer
-from .research_engine import ResearchEngine
+from .research_engine import ResearchEngine, ResearchResult
 from .formatter import NoteFormatter
 from .utils import MetricsTracker, StateManager, validate_environment
 
@@ -65,10 +65,21 @@ class ResearchBot:
             # Check if research was successful
             successful_results = sum(1 for r in research_results.values() if r.success)
             if successful_results == 0:
-                logger.error("All research providers failed")
-                self.metrics.record_research(analysis.category, False, analysis.confidence)
-                self.state.mark_note_processed(note.id, success=False)
-                return
+                logger.warning("All research providers failed, but attempting fallback formatting")
+                # Create a fallback research result
+                research_results['fallback'] = ResearchResult(
+                    provider='fallback',
+                    content=f"""Unable to conduct comprehensive research at this time due to API issues.
+
+Research was requested for: {analysis.category.title()} category content
+Confidence: {analysis.confidence:.2f}
+Reasoning: {analysis.reasoning}
+
+Please try again later or manually research this topic.""",
+                    success=True,  # Mark as success so it gets formatted
+                    tokens_used=0
+                )
+                successful_results = 1
             
             # Step 3: Synthesize results (if multiple providers succeeded)
             synthesized = None

@@ -61,6 +61,21 @@ class ResearchEngine:
                 Include recent developments and future trends.
             """,
             
+            'business': """
+                Research this business/enterprise topic: "{content}"
+                
+                Provide comprehensive business intelligence including:
+                1. Company background, financials, and market position
+                2. Recent business developments and strategic initiatives
+                3. Leadership team and organizational structure
+                4. Technology investments and digital transformation efforts
+                5. Partnership opportunities and competitive landscape
+                6. Regulatory compliance and industry positioning
+                7. Meeting preparation insights and talking points
+                
+                Focus on actionable business intelligence for partnership discussions, meetings, and strategic decisions. Include relevant financial data, recent 10-K/earnings information if applicable, and competitive analysis.
+            """,
+            
             'building': """
                 Research this building/construction topic: "{content}"
                 
@@ -260,6 +275,7 @@ TALKING POINTS:
             system_prompts = {
                 'software': "You are an expert software engineer with deep knowledge of modern development practices.",
                 'ai': "You are an AI/ML specialist with expertise in current models and techniques.",
+                'business': "You are a business intelligence analyst with expertise in enterprise research, financial analysis, and partnership development. You have access to current market data and business intelligence.",
                 'building': "You are a construction expert with practical DIY experience.",
                 'lifestyle': "You are a lifestyle consultant with local knowledge and creative ideas.",
                 'productivity': "You are a productivity expert focused on evidence-based methods.",
@@ -304,6 +320,7 @@ TALKING POINTS:
             system_prompts = {
                 'software': "You are an expert software engineer providing practical development advice.",
                 'ai': "You are an AI researcher with expertise in practical ML applications.",
+                'business': "You are a senior business analyst specializing in enterprise intelligence, financial research, and strategic business analysis. You provide actionable insights for business meetings and partnerships.",
                 'building': "You are a construction professional with hands-on experience.",
                 'lifestyle': "You are a lifestyle expert with creative and practical suggestions.",
                 'productivity': "You are a productivity coach focused on sustainable improvements.",

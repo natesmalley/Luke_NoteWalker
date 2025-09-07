@@ -30,9 +30,9 @@ class Config:
     parallel_research: bool = True
     
     # AI Model settings
-    claude_analysis_model: str = "claude-3-haiku-20240307"
-    claude_research_model: str = "claude-3-sonnet-20240229"
-    openai_model: str = "gpt-4"
+    claude_analysis_model: str = "claude-3-5-haiku-20241022"
+    claude_research_model: str = "claude-3-5-sonnet-20250107"
+    openai_model: str = "gpt-4o-mini"
     
     # Token limits
     max_analysis_tokens: int = 300
@@ -40,7 +40,7 @@ class Config:
     
     # Categories
     research_categories: List[str] = field(default_factory=lambda: [
-        "software", "ai", "building", "lifestyle", "productivity", "general"
+        "software", "ai", "business", "building", "lifestyle", "productivity", "general"
     ])
     
     # Logging
